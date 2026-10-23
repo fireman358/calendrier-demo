@@ -1,0 +1,270 @@
+/* ===== Base ===== */
+:root {
+    --bleu-fonce: #2c3e50;
+    --bleu: #34495e;
+    --vert: #27ae60;
+    --rouge: #d81b60;
+    --fond: #f0f2f5;
+    --blanc: #fff;
+    --bord: #e1e4e8;
+    --bleu-vac: #e3f2fd;
+    --rouge-ferie: #ffebee;
+    --gris-we: #f5f5f5;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--fond);
+    color: #333;
+}
+
+/* ===== En-tête ===== */
+.app-header {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    background: var(--bleu-fonce); color: #fff;
+    padding: 10px 18px; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+.brand { font-size: 1.25em; font-weight: bold; }
+.tabs { display: flex; gap: 4px; margin-right: auto; }
+.tab {
+    background: transparent; color: #cfd8dc; border: none; padding: 10px 18px;
+    font-size: 1em; cursor: pointer; border-radius: 6px; font-weight: 600;
+}
+.tab.active { background: #4a6076; color: #fff; }
+.tab:hover { color: #fff; }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.select-annee {
+    padding: 8px 12px; border-radius: 5px; border: none;
+    font-weight: bold; cursor: pointer; font-size: .95em;
+}
+.btn {
+    background: var(--bleu); color: #fff; border: none; padding: 9px 14px;
+    border-radius: 5px; cursor: pointer; font-weight: 600; font-size: .9em;
+}
+.btn:hover { filter: brightness(1.15); }
+.btn-primary { background: var(--vert); }
+.btn-print { background: #e67e22; }
+.btn-danger { background: #c0392b; }
+.btn-mini { padding: 4px 8px; font-size: .8em; }
+
+/* ===== Vues ===== */
+.view { display: none; padding: 20px; max-width: 1400px; margin: 0 auto; }
+.view.active { display: block; }
+
+.card {
+    background: var(--blanc); border: 1px solid var(--bord);
+    border-radius: 10px; padding: 16px; margin-bottom: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+h2 { margin: 0 0 10px; color: var(--bleu-fonce); font-size: 1.1em; }
+
+/* ===== Vue mois (écran d'accueil) ===== */
+.mois-view-header {
+    display: flex; align-items: center; justify-content: center; gap: 20px;
+    margin-bottom: 14px;
+}
+.mois-view-header .month-header { margin: 0; font-size: 2em; }
+.mois-view-flex { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; }
+.mois-view-photos {
+    flex: 2.2; display: grid; gap: 10px; align-content: start;
+    grid-template-columns: repeat(3, 1fr);
+}
+.mois-view-photos:empty::after {
+    content: "Aucune photo pour ce mois-ci 🙂"; grid-column: 1/-1;
+    color: #999; font-style: italic; padding: 20px; text-align: center;
+}
+.mois-view-infos { flex: 1.2; min-width: 280px; align-self: flex-start; }
+.mois-cal-wrap .mois-table td { height: 56px; font-size: .95em; }
+.mois-cal-wrap .mois-table td .day-num { font-size: 1em; }
+.mois-cal-wrap .mois-table td .icon-row { font-size: 1.05em; }
+
+/* ===== Prochains anniversaires ===== */
+.alerte { margin-bottom: 14px; }
+.alerte:empty { display: none; }
+.prochains-liste { display: flex; gap: 10px; flex-wrap: wrap; }
+.b-day {
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    border: 1px solid #ffcc80; border-radius: 40px; padding: 6px 14px 6px 6px;
+    font-weight: 600;
+}
+.b-day.soon { background: linear-gradient(135deg, #ffebee, #ffcdd2); border-color: #ef9a9a; }
+.b-day img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; }
+.b-day .avatar {
+    width: 34px; height: 34px; border-radius: 50%; background: #ff9800; color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 1.1em;
+}
+.b-day .quand { font-size: .8em; color: #795548; font-weight: normal; }
+
+/* ===== Grille année ===== */
+.annee-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px;
+}
+.mois-card {
+    background: var(--blanc); border: 1px solid var(--bord); border-radius: 10px;
+    padding: 12px; cursor: pointer; transition: box-shadow .15s, transform .15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.mois-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.15); transform: translateY(-2px); }
+.mois-card h3 {
+    margin: 0 0 8px; color: var(--bleu-fonce); text-transform: uppercase;
+    letter-spacing: 1px; font-size: 1.05em; text-align: center;
+}
+.mois-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.mois-table th {
+    background: var(--bleu-fonce); color: #fff; font-size: .68em;
+    padding: 3px 0; text-transform: uppercase;
+}
+.mois-table td {
+    border: 1px solid #d9dde2; height: 34px; text-align: center;
+    vertical-align: top; font-size: .82em; padding: 2px; position: relative;
+}
+.mois-table td .day-num { font-weight: bold; color: #555; display: block; }
+.mois-table td.is-weekend { background: var(--gris-we); }
+.mois-table td.is-vacation { background: var(--bleu-vac); }
+.mois-table td.is-holiday { background: var(--rouge-ferie); }
+.mois-table td.is-today { outline: 2px solid #2980b9; outline-offset: -2px; font-weight: bold; }
+.mois-table td .icon-row { font-size: .9em; line-height: 1.1; }
+.mois-badges { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 8px; min-height: 20px; }
+.badge {
+    font-size: .72em; background: #ecf0f1; border-radius: 10px; padding: 2px 8px;
+    color: #555; font-weight: 600;
+}
+.badge.ferie { background: var(--rouge-ferie); color: #b71c1c; }
+.badge.vac { background: var(--bleu-vac); color: #1565c0; }
+.badge.anniv { background: #fff3e0; color: #e65100; }
+
+/* ===== Modal mois ===== */
+.modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    z-index: 200; display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+}
+.modal.hidden, .hidden { display: none !important; }
+.modal-content {
+    background: #fff; border-radius: 12px; max-width: 1100px; width: 100%;
+    max-height: 92vh; overflow: auto; padding: 22px; position: relative;
+}
+.modal-close {
+    position: absolute; top: 10px; right: 12px; border: none; background: #eee;
+    width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1em;
+}
+.month-header {
+    text-align: center; text-transform: uppercase; margin: 0 0 14px;
+    color: var(--bleu-fonce); letter-spacing: 2px; font-size: 1.8em;
+}
+.modal-cols { display: flex; gap: 20px; flex-wrap: wrap; }
+.modal-photos {
+    flex: 2.2; display: grid; gap: 8px; align-content: start;
+    grid-template-columns: repeat(3, 1fr);
+}
+.modal-photos:empty::after {
+    content: "Aucun anniversaire ce mois-ci 🙂"; grid-column: 1/-1;
+    color: #999; font-style: italic; padding: 30px; text-align: center;
+}
+.photo-wrapper {
+    border: 1px solid #ddd; background: #fff; padding: 4px; text-align: center;
+    font-size: .78em; font-weight: bold; color: var(--rouge);
+    display: flex; flex-direction: column; position: relative; overflow: hidden;
+}
+.photo-img-wrap { position: relative; min-height: 90px; }
+.photo-wrapper img { width: 100%; height: 100%; max-height: 140px; object-fit: contain; background: #f9f9f9; display: block; }
+.photo-label { padding: 3px 0 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.photo-note {
+    position: absolute; top: 4px; left: 4px; right: 4px;
+    background: rgba(0,0,0,.72); color: #fff; font-size: .85em; font-weight: normal;
+    padding: 4px; border-radius: 4px; z-index: 10; line-height: 1.3;
+}
+.modal-infos {
+    flex: 1.2; min-width: 260px; background: #fdfdfd; border: 1px solid #eee;
+    border-radius: 10px; padding: 14px;
+}
+.modal-infos h3 {
+    border-bottom: 2px solid #333; margin: 10px 0 5px; color: var(--bleu-fonce);
+    font-size: .85em; text-transform: uppercase;
+}
+.modal-infos ul { list-style: none; padding: 0; margin: 0 0 10px; font-size: .85em; }
+.modal-infos li { margin-bottom: 3px; border-bottom: 1px solid #f4f4f4; padding: 2px 0; }
+
+/* ===== Gestion ===== */
+.gestion-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.gtab {
+    background: #dfe4ea; color: #333; border: none; padding: 10px 16px;
+    border-radius: 8px; cursor: pointer; font-weight: 600; font-size: .92em;
+}
+.gtab.active { background: var(--bleu-fonce); color: #fff; }
+.gpanel { display: none; }
+.gpanel.active { display: block; }
+.panel-toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.input { padding: 9px 12px; border: 1px solid #ccc; border-radius: 5px; flex: 1; min-width: 200px; font-size: .95em; }
+.hint { font-size: .85em; color: #777; margin: 0 0 10px; }
+
+.data-table { width: 100%; border-collapse: collapse; font-size: .9em; }
+.data-table th {
+    background: var(--bleu-fonce); color: #fff; padding: 8px; text-align: left;
+    text-transform: uppercase; font-size: .78em;
+}
+.data-table td { border: 1px solid #ddd; padding: 7px 8px; }
+.data-table tr:nth-child(even) { background: #fafbfc; }
+.data-table tr:hover { background: #f0f6ff; }
+.data-table input, .data-table select {
+    border: 1px solid #ccc; border-radius: 4px; padding: 5px 6px; font-size: .95em; width: 100%;
+}
+
+/* ===== Photos (gestion) ===== */
+.photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.photo-item {
+    border: 1px solid var(--bord); border-radius: 8px; overflow: hidden; background: #fff;
+}
+.photo-item img { width: 100%; height: 120px; object-fit: cover; display: block; }
+.photo-item .nom {
+    padding: 6px 8px; font-size: .78em; font-weight: 600; color: #444;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.photo-item .actions { padding: 0 6px 8px; display: flex; gap: 6px; }
+
+/* ===== Toast ===== */
+.toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #2ecc71; color: #fff; padding: 12px 22px; border-radius: 8px;
+    font-weight: 600; z-index: 300; box-shadow: 0 4px 14px rgba(0,0,0,.3);
+}
+.toast.err { background: #e74c3c; }
+
+/* ===== Zone impression (normalement cachée à l'écran) ===== */
+.print-area { display: none; }
+
+/* ===== Impression : A4 paysage, une page par mois ===== */
+@media print {
+    @page { size: A4 landscape; margin: 0; }
+    body { background: white; }
+    .app-header, .view, .toast, .modal { display: none !important; }
+    .print-area { display: block !important; }
+    .page {
+        width: 29.7cm; height: 21cm; box-sizing: border-box; padding: .8cm;
+        page-break-after: always; overflow: hidden; position: relative;
+        background: white; display: flex; flex-direction: column;
+    }
+    .print-month-title {
+        text-align: center; font-size: 2.2em; text-transform: uppercase;
+        color: var(--bleu-fonce); letter-spacing: 2px; margin: 0 0 8px;
+    }
+    .print-flex { display: flex; gap: 16px; flex: 1; min-height: 0; }
+    .print-photos {
+        flex: 2.2; display: grid; gap: 8px; align-content: stretch; min-height: 0;
+    }
+    .print-infos { flex: 1.2; min-width: 0; overflow: hidden; }
+    .print-cal { width: 100%; border-collapse: collapse; table-layout: fixed; flex: 1; }
+    table.print-cal th, table.print-cal td { border: 1px solid #bbb; padding: 4px; vertical-align: top; }
+    table.print-cal th { background: var(--bleu-fonce); color: white; text-transform: uppercase; font-size: .8em; }
+    .p-day { font-weight: bold; font-size: 1.3em; color: #7f8c8d; display: block; }
+    .p-icons { font-size: 1.3em; }
+}
+
+/* Logo edukisto dans le header */
+.brand{display:flex;align-items:center;gap:8px}
+.brand-logo svg{width:22px;height:22px;display:block}
+.brand-logo:hover svg{filter:drop-shadow(0 0 8px rgba(14,116,144,.5))}

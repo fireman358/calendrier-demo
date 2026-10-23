@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Démo · Calendrier Familial · edukisto</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div style="background:#0e7490;color:#fff;text-align:center;font-size:.78rem;padding:6px 10px;">Version démo — les noms, photos et dates sont fictifs. Créez votre propre calendrier familial en important vos données.</div>
+
+<header class="app-header">
+    <div class="brand"><a href="https://edukisto.win/" target="_blank" rel="noopener" class="brand-logo" title="edukisto — relier & orienter" style="text-decoration:none"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M32 3l5.2 18.2 10.8-5.2-5.2 10.8L61 32l-18.2 5.2 5.2 10.8-10.8-5.2L32 61l-5.2-18.2-10.8 5.2 5.2-10.8L3 32l18.2-5.2-5.2-10.8 10.8 5.2z" fill="#0e7490"/><path d="M32 32c-1.6-2-3-3.1-4.8-3.1a4.7 4.7 0 1 0 0 9.4c1.8 0 3.2-1.1 4.8-3.1 1.6 2 3 3.1 4.8 3.1a4.7 4.7 0 1 0 0-9.4c-1.8 0-3.2 1.1-4.8 3.1z" stroke="#fff" stroke-width="2.2"/></svg></a>📅 Calendrier Familial</div>
+    <nav class="tabs">
+        <button class="tab active" data-view="mois">Mois</button>
+        <button class="tab" data-view="calendrier">Année</button>
+        <button class="tab" data-view="gestion">Gestion</button>
+    </nav>
+    <div class="header-actions">
+        <select id="select-annee" class="select-annee" title="Année"></select>
+        <button id="btn-print" class="btn btn-print" title="Générer la version imprimable A4 (une page par mois)">🖨️ Imprimer</button>
+        <button id="btn-export" class="btn" title="Sauvegarder toutes les données dans un fichier JSON">💾 Exporter</button>
+        <button id="btn-import" class="btn" title="Restaurer depuis un fichier JSON">📂 Importer</button>
+        <input type="file" id="file-import" accept=".json" hidden>
+    </div>
+</header>
+
+<!-- ============ VUE MOIS COURANT (ACCUEIL) ============ -->
+<main id="view-mois" class="view active">
+    <div class="alerte" id="alerte"></div>
+
+    <div class="mois-view-header">
+        <button id="btn-mois-prec" class="btn" title="Mois précédent">◀</button>
+        <h1 id="mois-titre" class="month-header"></h1>
+        <button id="btn-mois-suiv" class="btn" title="Mois suivant">▶</button>
+    </div>
+
+    <div class="mois-view-flex">
+        <div class="mois-view-photos" id="mois-photos"></div>
+        <div class="mois-view-infos modal-infos" id="mois-infos"></div>
+    </div>
+
+    <div id="mois-cal" class="mois-cal-wrap"></div>
+</main>
+
+<!-- ============ VUE CALENDRIER (ANNÉE) ============ -->
+<main id="view-calendrier" class="view">
+
+    <section class="prochains card">
+        <h2>🎁 Prochains anniversaires</h2>
+        <div id="prochains-liste" class="prochains-liste"></div>
+    </section>
+
+    <section class="annee-grid" id="annee-grid"></section>
+
+    <!-- Détail du mois (modal) -->
+    <div id="modal-mois" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" onclick="fermerModal()">✕</button>
+            <h1 id="modal-titre" class="month-header"></h1>
+            <div class="modal-cols">
+                <div class="modal-photos" id="modal-photos"></div>
+                <div class="modal-infos" id="modal-infos"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- ============ VUE GESTION ============ -->
+<main id="view-gestion" class="view">
+    <nav class="gestion-tabs">
+        <button class="gtab active" data-panel="personnes">🎂 Anniversaires</button>
+        <button class="gtab" data-panel="photos">🖼️ Photos</button>
+        <button class="gtab" data-panel="evenements">🎊 Événements</button>
+        <button class="gtab" data-panel="feries">🏁 Jours fériés</button>
+        <button class="gtab" data-panel="vacances">🏖️ Vacances</button>
+    </nav>
+
+    <!-- Anniversaires -->
+    <section id="panel-personnes" class="gpanel card active">
+        <div class="panel-toolbar">
+            <input type="text" id="recherche-personne" placeholder="Rechercher une personne…" class="input">
+            <button class="btn btn-primary" id="btn-add-personne">➕ Ajouter</button>
+        </div>
+        <table class="data-table" id="table-personnes">
+            <thead><tr><th>Nom</th><th>Jour</th><th>Mois</th><th>Année</th><th>Type</th><th>Note</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <!-- Photos -->
+    <section id="panel-photos" class="gpanel card">
+        <p class="hint">Deux sources de photos : le dossier <strong>Photos/</strong> à côté d'index.html (recommandé, visible par tous) ou l'upload dans ce navigateur. Le nom du fichier (sans extension) correspond au nom exact de la personne.</p>
+        <div class="panel-toolbar">
+            <input type="text" id="recherche-photo" placeholder="Rechercher…" class="input">
+            <label class="btn btn-primary" for="file-photos">➕ Ajouter des photos</label>
+            <input type="file" id="file-photos" accept="image/*" multiple hidden>
+        </div>
+        <div id="photos-grid" class="photos-grid"></div>
+    </section>
+
+    <!-- Événements spéciaux -->
+    <section id="panel-evenements" class="gpanel card">
+        <div class="panel-toolbar">
+            <input type="text" id="recherche-evenement" placeholder="Rechercher…" class="input">
+            <button class="btn btn-primary" id="btn-add-evenement">➕ Ajouter</button>
+        </div>
+        <table class="data-table" id="table-evenements">
+            <thead><tr><th>Année</th><th>Date</th><th>Libellé</th><th>Icône</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <!-- Jours fériés -->
+    <section id="panel-feries" class="gpanel card">
+        <div class="panel-toolbar">
+            <select id="select-annee-feries" class="select-annee"></select>
+            <button class="btn btn-primary" id="btn-add-ferie">➕ Ajouter</button>
+            <button class="btn" id="btn-generer-feries" title="Générer automatiquement les jours fériés belges pour cette année">⚙️ Générer (Belgique)</button>
+        </div>
+        <table class="data-table" id="table-feries">
+            <thead><tr><th>Date</th><th>Libellé</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <!-- Vacances -->
+    <section id="panel-vacances" class="gpanel card">
+        <div class="panel-toolbar">
+            <select id="select-annee-vacances" class="select-annee"></select>
+            <button class="btn btn-primary" id="btn-add-vacances">➕ Ajouter</button>
+        </div>
+        <table class="data-table" id="table-vacances">
+            <thead><tr><th>Début</th><th>Fin</th><th>Libellé</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </section>
+</main>
+
+<div id="toast" class="toast hidden"></div>
+
+<!-- Version imprimable (remplie dynamiquement, même structure que l'ancien système Publisher) -->
+<div id="print-area" class="print-area"></div>
+
+<script src="donnees/donnees-initiales.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/print.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
