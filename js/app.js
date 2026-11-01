@@ -199,9 +199,9 @@ async function rendreMoisCourant() {
        manière éparse mais sans trou. Rotation et empilement aléatoires. */
     const zoneEl = document.getElementById("mois-photos");
     zoneEl.innerHTML = "";
-    const cols = n <= 3 ? n : n <= 8 ? 3 : 4;
+    const cols = n <= 2 ? n : 3;
     const rows = Math.ceil(n / cols);
-    const HAUT_LIGNE = 230;
+    const HAUT_LIGNE = 300;
     zoneEl.style.minHeight = (rows * HAUT_LIGNE + 28) + "px";
     melange.forEach((a, idx) => {
         const note = (a.note && a.note.trim()) ? `<span class="photo-note">${escapeHtml(a.note)}</span>` : "";
