@@ -187,48 +187,56 @@ async function rendreMoisCourant() {
 
     const avecPhotos = (await Promise.all(annivs.map(async a => ({ ...a, url: await resoudrePhoto(a.nom) })))).filter(a => a.url);
 
-    /* MÉLI-MÉLO : uniquement les photos du mois affiché, en tas de polaroids
-       éparpillés — ordre, rotation, décalage et empilement aléatoires à chaque
-       rendu (ouverture, ◀▶, bouton 🔀). Les photos se chevauchent légèrement
-       mais restent toutes lisibles ; le survol redresse et agrandit. */
+
+    /* MÉLI-MÉLO : uniquement les photos du mois affiché. La TAILLE des photos
+       s'adapte au nombre : le pas de la grille remplit exactement la largeur
+       de la zone, et chaque photo fait ~1,4× ce pas — elles se chevauchent
+       donc obligatoirement (~30%) tout en restant toutes visibles. */
     const melange = melangerTableau(avecPhotos);
     const n = melange.length || 1;
-    /* Remplissage de l'espace : les photos sont réparties sur une grille
-       logique (colonnes/lignes) qui couvre TOUTE la zone, avec un jitter
-       aléatoire à l'intérieur de chaque cellule — l'espace est rempli de
-       manière éparse mais sans trou. Rotation et empilement aléatoires. */
     const zoneEl = document.getElementById("mois-photos");
     zoneEl.innerHTML = "";
-    const cols = n <= 2 ? n : 3;
+    zoneEl.style.minHeight = "";
+    /* colonnes selon le nombre : 1-2 → n, 3-4 → 2, 5-8 → 3, 9-12 → 4 */
+    const cols = n <= 2 ? n : n <= 4 ? 2 : n <= 8 ? 3 : 4;
     const rows = Math.ceil(n / cols);
-    const HAUT_LIGNE = 300;
-    zoneEl.style.minHeight = (rows * HAUT_LIGNE + 28) + "px";
-    melange.forEach((a, idx) => {
-        const note = (a.note && a.note.trim()) ? `<span class="photo-note">${escapeHtml(a.note)}</span>` : "";
-        const rot = (Math.random() * 70 - 35).toFixed(1);
-        const z = Math.floor(Math.random() * n) + 1;
-        const col = idx % cols;
-        const row = Math.floor(idx / cols);
-        const dansRow = Math.min(cols, n - row * cols);
-        const cxFr = (col + 0.5) / dansRow;
-        const cyFr = (row + 0.5) / rows;
-        const div = document.createElement("div");
-        div.className = "polaroid";
-        div.style.zIndex = z;
-        div.innerHTML = `<div class="photo-img-wrap"><img src="${a.url}" alt="${escapeHtml(a.nom)}">${note}</div>
-            <div class="photo-label">${escapeHtml(a.nom)}</div>`;
-        zoneEl.appendChild(div);
-        const placer = () => {
-            const W = zoneEl.clientWidth, H = zoneEl.clientHeight;
-            const dx = (cxFr * W - div.offsetWidth / 2 + (Math.random() * 40 - 20)).toFixed(0);
-            const dy = (cyFr * H - div.offsetHeight / 2 + (Math.random() * 26 - 13)).toFixed(0);
-            div.style.left = dx + "px";
-            div.style.top = dy + "px";
-            div.style.transform = `rotate(${rot}deg)`;
-        };
-        placer();
-        div._placer = placer;
-    });
+    const CHEV = 1.42;  // taille photo / pas de grille → chevauchement ~30%
+    const meliMelo = () => {
+        const W = Math.max(zoneEl.clientWidth, 120);
+        const pas = W / cols;                     // largeur d'une cellule
+        const taille = Math.min(pas * CHEV, 420); // taille de la photo
+        const imgH = Math.round(taille * 0.75);   // image 4:3 (le reste = cadre+nom)
+        zoneEl.style.minHeight = (rows * (taille * 0.82) + 20) + "px";
+        melange.forEach((a, idx) => {
+            let div = zoneEl.children[idx];
+            const note = (a.note && a.note.trim()) ? `<span class="photo-note">${escapeHtml(a.note)}</span>` : "";
+            if (!div) {
+                div = document.createElement("div");
+                div.className = "polaroid";
+                zoneEl.appendChild(div);
+            }
+            div.style.width = Math.round(taille) + "px";
+            div.style.zIndex = Math.floor(Math.random() * n) + 1;
+            if (!div.dataset.init) {
+                div.dataset.init = "1";
+                div.innerHTML = `<div class="photo-img-wrap"><img src="${a.url}" alt="${escapeHtml(a.nom)}">${note}</div>
+                    <div class="photo-label">${escapeHtml(a.nom)}</div>`;
+                div.style.transform = `rotate(${(Math.random() * 70 - 35).toFixed(1)}deg)`;
+            }
+            const img = div.querySelector("img");
+            if (img) img.style.height = imgH + "px";
+            const col = idx % cols;
+            const row = Math.floor(idx / cols);
+            const dansRow = Math.min(cols, n - row * cols);
+            const cx = ((col + 0.5) / dansRow) * W + (Math.random() * 30 - 15);
+            const H = zoneEl.clientHeight;
+            const cy = ((row + 0.5) / rows) * H + (Math.random() * 20 - 10);
+            div.style.left = Math.round(cx - taille / 2) + "px";
+            div.style.top = Math.round(cy - div.offsetHeight / 2) + "px";
+            div._placer = meliMelo;
+        });
+    };
+    meliMelo();
     if (!window._resizeMeliMelo) {
         window._resizeMeliMelo = true;
         window.addEventListener("resize", () => {
