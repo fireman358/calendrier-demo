@@ -75,6 +75,48 @@ h2 { margin: 0 0 10px; color: var(--bleu-fonce); font-size: 1.1em; }
     content: "Aucune photo pour ce mois-ci 🙂"; grid-column: 1/-1;
     color: #999; font-style: italic; padding: 20px; text-align: center;
 }
+
+/* ===== Méli-mélo : tas de polaroids éparpillés (vue Mois) ===== */
+.mois-view-photos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    min-height: 200px;
+    padding: 26px 8px;
+    position: relative;
+}
+.mois-view-photos .polaroid {
+    width: 150px;
+    flex: 0 0 auto;
+    margin: -14px;
+    background: #fff;
+    padding: 7px 7px 4px;
+    border: none;
+    border-radius: 3px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.35);
+    transition: transform .25s ease, box-shadow .25s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: visible;
+}
+.mois-view-photos .polaroid:hover {
+    transform: scale(1.18) rotate(0deg) !important;
+    z-index: 99 !important;
+    box-shadow: 0 12px 28px rgba(0,0,0,.45);
+}
+.mois-view-photos .polaroid img { width: 100%; height: 130px; max-height: none; object-fit: cover; border-radius: 2px; background: #f0f0f0; display: block; }
+.mois-view-photos .polaroid .photo-label { padding: 4px 2px 2px; font-size: .72em; }
+
+/* ===== Badge version ===== */
+.app-version {
+    margin-left: auto;
+    align-self: center;
+    font-size: .62em;
+    opacity: .55;
+    white-space: nowrap;
+}
 .mois-view-infos { flex: 1.2; min-width: 280px; align-self: flex-start; }
 .mois-cal-wrap .mois-table td { height: 56px; font-size: .95em; }
 .mois-cal-wrap .mois-table td .day-num { font-size: 1em; }

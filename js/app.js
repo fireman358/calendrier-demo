@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         initTabs();
         initHeaderActions();
         initNavMois();
+        afficherVersion();
         await initCachePhotos();
         afficherAlerte();
         rendreMoisCourant();
@@ -88,6 +89,17 @@ function initHeaderActions() {
     document.getElementById("file-import").onchange = importerJSON;
 }
 
+async function afficherVersion() {
+    try {
+        const r = await fetch("version.txt", { cache: "no-store" });
+        if (!r.ok) return;
+        const v = (await r.text()).trim();
+        const el = document.getElementById("app-version");
+        if (el) el.textContent = v;
+        console.log("Calendrier Familial " + v);
+    } catch (e) { /* version.txt inaccessible */ }
+}
+
 function toast(msg, err = false) {
     const t = document.getElementById("toast");
     t.textContent = msg;
@@ -133,7 +145,16 @@ async function rendreProchains() {
 }
 
 /* ================= Vue mois courant (accueil) ================= */
+function melangerTableau(t) {
+    const r = [...t];
+    for (let i = r.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [r[i], r[j]] = [r[j], r[i]];
+    }
+    return r;
+}
 function initNavMois() {
+    document.getElementById("btn-melanger-photos").onclick = () => rendreMoisCourant();
     document.getElementById("btn-mois-prec").onclick = () => {
         state.moisCourant--;
         if (state.moisCourant < 0) { state.moisCourant = 11; state.annee--; majSelectAnnee(); }
@@ -165,9 +186,20 @@ async function rendreMoisCourant() {
         .sort((a, b) => a.jour - b.jour);
 
     const avecPhotos = (await Promise.all(annivs.map(async a => ({ ...a, url: await resoudrePhoto(a.nom) })))).filter(a => a.url);
-    document.getElementById("mois-photos").innerHTML = avecPhotos.map(a => {
+
+    /* MÉLI-MÉLO : uniquement les photos du mois affiché, en tas de polaroids
+       éparpillés — ordre, rotation, décalage et empilement aléatoires à chaque
+       rendu (ouverture, ◀▶, bouton 🔀). Les photos se chevauchent légèrement
+       mais restent toutes lisibles ; le survol redresse et agrandit. */
+    const melange = melangerTableau(avecPhotos);
+    const n = melange.length || 1;
+    document.getElementById("mois-photos").innerHTML = melange.map(a => {
         const note = (a.note && a.note.trim()) ? `<span class="photo-note">${escapeHtml(a.note)}</span>` : "";
-        return `<div class="photo-wrapper">
+        const rot = (Math.random() * 70 - 35).toFixed(1);
+        const dx = (Math.random() * 36 - 18).toFixed(0);
+        const dy = (Math.random() * 20 - 10).toFixed(0);
+        const z = Math.floor(Math.random() * n) + 1;
+        return `<div class="polaroid" style="transform:translate(${dx}px,${dy}px) rotate(${rot}deg);z-index:${z}">
             <div class="photo-img-wrap"><img src="${a.url}" alt="${escapeHtml(a.nom)}">${note}</div>
             <div class="photo-label">${escapeHtml(a.nom)}</div>
         </div>`;
