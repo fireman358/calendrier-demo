@@ -199,9 +199,9 @@ async function rendreMoisCourant() {
     zoneEl.style.minHeight = "";
     /* colonnes proportionnelles au nombre (√n) : photos plus petites quand
        elles sont nombreuses, jamais géantes */
-    const cols = Math.min(5, Math.max(1, Math.ceil(Math.sqrt(n * 2))));
+    const cols = Math.min(n, 5, Math.max(1, Math.ceil(Math.sqrt(n * 2))));
     const rows = Math.ceil(n / cols);
-    const CHEV = 0.96;   // photo légèrement plus petite que sa cellule → petit espace entre voisines
+    const CHEV = n <= 2 ? 0.7 : n <= 4 ? 0.84 : 0.94;   // peu de photos → plus petites et très aérées dans la zone
     const ROT_MAX = 10;  // degrés — chevauchement des coins minimal
     const M = 12;
     const zs = melangerTableau([...Array(n).keys()].map(i => i + 1));
