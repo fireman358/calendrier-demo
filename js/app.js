@@ -200,13 +200,18 @@ async function rendreMoisCourant() {
     /* colonnes selon le nombre : 1-2 → n, 3-4 → 2, 5-8 → 3, 9-12 → 4 */
     const cols = n <= 2 ? n : n <= 4 ? 2 : n <= 8 ? 3 : 4;
     const rows = Math.ceil(n / cols);
-    const CHEV = 1.42;  // taille photo / pas de grille → chevauchement ~30%
+    const CHEV = 1.26;  // chevauchement léger : chaque coin visible, aucune photo enterrée
+    /* z-index unique mélangé (1..n) : ordre d'empilement net, jamais deux photos
+       à la même profondeur ; combiné au chevauchement réduit, chaque photo garde
+       sa part visible */
+    const zs = melangerTableau([...Array(n).keys()].map(i => i + 1));
     const meliMelo = () => {
         const W = Math.max(zoneEl.clientWidth, 120);
         const pas = W / cols;                     // largeur d'une cellule
         const taille = Math.min(pas * CHEV, 420); // taille de la photo
-        const imgH = Math.round(taille * 0.75);   // image 4:3 (le reste = cadre+nom)
-        zoneEl.style.minHeight = (rows * (taille * 0.82) + 20) + "px";
+        const imgH = Math.round(taille * 0.75);   // image 4:3
+        zoneEl.style.minHeight = (rows * (taille * 0.88) + 20) + "px";
+        const H = zoneEl.clientHeight;
         melange.forEach((a, idx) => {
             let div = zoneEl.children[idx];
             const note = (a.note && a.note.trim()) ? `<span class="photo-note">${escapeHtml(a.note)}</span>` : "";
@@ -216,23 +221,26 @@ async function rendreMoisCourant() {
                 zoneEl.appendChild(div);
             }
             div.style.width = Math.round(taille) + "px";
-            div.style.zIndex = Math.floor(Math.random() * n) + 1;
+            div.style.zIndex = zs[idx];
             if (!div.dataset.init) {
                 div.dataset.init = "1";
                 div.innerHTML = `<div class="photo-img-wrap"><img src="${a.url}" alt="${escapeHtml(a.nom)}">${note}</div>
                     <div class="photo-label">${escapeHtml(a.nom)}</div>`;
-                div.style.transform = `rotate(${(Math.random() * 70 - 35).toFixed(1)}deg)`;
+                div.style.transform = `rotate(${(Math.random() * 60 - 30).toFixed(1)}deg)`;
             }
             const img = div.querySelector("img");
             if (img) img.style.height = imgH + "px";
             const col = idx % cols;
             const row = Math.floor(idx / cols);
             const dansRow = Math.min(cols, n - row * cols);
-            const cx = ((col + 0.5) / dansRow) * W + (Math.random() * 30 - 15);
-            const H = zoneEl.clientHeight;
-            const cy = ((row + 0.5) / rows) * H + (Math.random() * 20 - 10);
+            let cx = ((col + 0.5) / dansRow) * W + (Math.random() * 24 - 12);
+            let cy = ((row + 0.5) / rows) * H + (Math.random() * 18 - 9);
+            /* bornage : la photo reste ENTIÈREMENT dans sa zone — plus de
+               débordement sur la liste des anniversaires à droite */
+            const marge = 10;
+            cx = Math.max(taille / 2 + marge, Math.min(cx, W - taille / 2 - marge));
             div.style.left = Math.round(cx - taille / 2) + "px";
-            div.style.top = Math.round(cy - div.offsetHeight / 2) + "px";
+            div.style.top = Math.round(Math.max(marge, Math.min(cy - div.offsetHeight / 2, H - div.offsetHeight - marge))) + "px";
             div._placer = meliMelo;
         });
     };
