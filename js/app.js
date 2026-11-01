@@ -200,18 +200,22 @@ async function rendreMoisCourant() {
     /* colonnes selon le nombre : 1-2 → n, 3-4 → 2, 5-8 → 3, 9-12 → 4 */
     const cols = n <= 2 ? n : n <= 4 ? 2 : n <= 8 ? 3 : 4;
     const rows = Math.ceil(n / cols);
-    const CHEV = 1.26;  // chevauchement léger : chaque coin visible, aucune photo enterrée
-    /* z-index unique mélangé (1..n) : ordre d'empilement net, jamais deux photos
-       à la même profondeur ; combiné au chevauchement réduit, chaque photo garde
-       sa part visible */
+    const CHEV = 1.26;   // chevauchement léger entre voisines
+    const ROT_MAX = 18;  // degrés — les coins pivotés restent proches
+    const M = 12;        // marge intérieure de la zone
     const zs = melangerTableau([...Array(n).keys()].map(i => i + 1));
+    const rots = melange.map(() => (Math.random() * 2 * ROT_MAX - ROT_MAX).toFixed(1));
     const meliMelo = () => {
-        const W = Math.max(zoneEl.clientWidth, 120);
-        const pas = W / cols;                     // largeur d'une cellule
-        const taille = Math.min(pas * CHEV, 420); // taille de la photo
-        const imgH = Math.round(taille * 0.75);   // image 4:3
-        zoneEl.style.minHeight = (rows * (taille * 0.88) + 20) + "px";
-        const H = zoneEl.clientHeight;
+        const W = Math.max(zoneEl.clientWidth, 240);
+        const pas = W / cols;
+        let taille = Math.min(pas * CHEV, 420);
+        const imgH = Math.round(taille * 0.72);
+        const hh = imgH + 42;                      // image + cadre polaroid + nom
+        /* hauteur de la zone : contient la boîte englobante VERTICALE maximale
+           des photos pivotées (|sin|·L + cos·H), + interligne */
+        const bhMax = (taille * Math.sin(ROT_MAX * Math.PI / 180) + hh * Math.cos(ROT_MAX * Math.PI / 180)) / 2;
+        const H = Math.max(Math.ceil(rows * (2 * bhMax + 26) + 2 * M), 2 * bhMax + 2 * M + 10);
+        zoneEl.style.minHeight = H + "px";
         melange.forEach((a, idx) => {
             let div = zoneEl.children[idx];
             const note = (a.note && a.note.trim()) ? `<span class="photo-note">${escapeHtml(a.note)}</span>` : "";
@@ -226,21 +230,28 @@ async function rendreMoisCourant() {
                 div.dataset.init = "1";
                 div.innerHTML = `<div class="photo-img-wrap"><img src="${a.url}" alt="${escapeHtml(a.nom)}">${note}</div>
                     <div class="photo-label">${escapeHtml(a.nom)}</div>`;
-                div.style.transform = `rotate(${(Math.random() * 60 - 30).toFixed(1)}deg)`;
             }
+            div.dataset.rot = rots[idx];
+            div.style.transform = `rotate(${rots[idx]}deg)`;
             const img = div.querySelector("img");
             if (img) img.style.height = imgH + "px";
             const col = idx % cols;
             const row = Math.floor(idx / cols);
             const dansRow = Math.min(cols, n - row * cols);
-            let cx = ((col + 0.5) / dansRow) * W + (Math.random() * 24 - 12);
-            let cy = ((row + 0.5) / rows) * H + (Math.random() * 18 - 9);
-            /* bornage : la photo reste ENTIÈREMENT dans sa zone — plus de
-               débordement sur la liste des anniversaires à droite */
-            const marge = 10;
-            cx = Math.max(taille / 2 + marge, Math.min(cx, W - taille / 2 - marge));
-            div.style.left = Math.round(cx - taille / 2) + "px";
-            div.style.top = Math.round(Math.max(marge, Math.min(cy - div.offsetHeight / 2, H - div.offsetHeight - marge))) + "px";
+            /* boîte englobante APRÈS rotation — on borne le CENTRE pour que
+               cette boîte reste entièrement dans la zone : aucun débordement
+               possible sur le titre, la liste ou le calendrier du bas */
+            const r = rots[idx] * Math.PI / 180;
+            const bw = (taille * Math.cos(r) + hh * Math.abs(Math.sin(r))) / 2;
+            const bh = (taille * Math.abs(Math.sin(r)) + hh * Math.cos(r)) / 2;
+            const xMin = Math.min(bw + M, W / 2), xMax = Math.max(W - bw - M, W / 2);
+            const yMin = Math.min(bh + M, H / 2), yMax = Math.max(H - bh - M, H / 2);
+            const cx = ((col + 0.5) / dansRow) * (xMax - xMin) + xMin + (Math.random() * 20 - 10);
+            const cy = ((row + 0.5) / rows) * (yMax - yMin) + yMin + (Math.random() * 14 - 7);
+            const fcx = Math.max(xMin, Math.min(cx, xMax));
+            const fcy = Math.max(yMin, Math.min(cy, yMax));
+            div.style.left = Math.round(fcx - taille / 2) + "px";
+            div.style.top = Math.round(fcy - hh / 2) + "px";
             div._placer = meliMelo;
         });
     };
