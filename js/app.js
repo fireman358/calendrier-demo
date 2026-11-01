@@ -197,12 +197,13 @@ async function rendreMoisCourant() {
     const zoneEl = document.getElementById("mois-photos");
     zoneEl.innerHTML = "";
     zoneEl.style.minHeight = "";
-    /* colonnes selon le nombre : 1-2 → n, 3-4 → 2, 5-8 → 3, 9-12 → 4 */
-    const cols = n <= 2 ? n : n <= 4 ? 2 : n <= 8 ? 3 : 4;
+    /* colonnes proportionnelles au nombre (√n) : photos plus petites quand
+       elles sont nombreuses, jamais géantes */
+    const cols = Math.min(5, Math.max(1, Math.ceil(Math.sqrt(n * 2))));
     const rows = Math.ceil(n / cols);
-    const CHEV = 1.0;    // pas de chevauchement structurel : les photos se touchent bord à bord, seule la rotation (+ jitter) crée un léger recouvrement des coins
-    const ROT_MAX = 18;  // degrés — les coins pivotés restent proches
-    const M = 12;        // marge intérieure de la zone
+    const CHEV = 0.96;   // photo légèrement plus petite que sa cellule → petit espace entre voisines
+    const ROT_MAX = 10;  // degrés — chevauchement des coins minimal
+    const M = 12;
     const zs = melangerTableau([...Array(n).keys()].map(i => i + 1));
     const rots = melange.map(() => (Math.random() * 2 * ROT_MAX - ROT_MAX).toFixed(1));
     const meliMelo = () => {
@@ -246,8 +247,8 @@ async function rendreMoisCourant() {
             const bh = (taille * Math.abs(Math.sin(r)) + hh * Math.cos(r)) / 2;
             const xMin = Math.min(bw + M, W / 2), xMax = Math.max(W - bw - M, W / 2);
             const yMin = Math.min(bh + M, H / 2), yMax = Math.max(H - bh - M, H / 2);
-            const cx = ((col + 0.5) / dansRow) * (xMax - xMin) + xMin + (Math.random() * 20 - 10);
-            const cy = ((row + 0.5) / rows) * (yMax - yMin) + yMin + (Math.random() * 14 - 7);
+            const cx = ((col + 0.5) / dansRow) * (xMax - xMin) + xMin + (Math.random() * 12 - 6);
+            const cy = ((row + 0.5) / rows) * (yMax - yMin) + yMin + (Math.random() * 8 - 4);
             const fcx = Math.max(xMin, Math.min(cx, xMax));
             const fcy = Math.max(yMin, Math.min(cy, yMax));
             div.style.left = Math.round(fcx - taille / 2) + "px";
