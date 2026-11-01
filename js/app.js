@@ -193,17 +193,48 @@ async function rendreMoisCourant() {
        mais restent toutes lisibles ; le survol redresse et agrandit. */
     const melange = melangerTableau(avecPhotos);
     const n = melange.length || 1;
-    document.getElementById("mois-photos").innerHTML = melange.map(a => {
+    /* Remplissage de l'espace : les photos sont réparties sur une grille
+       logique (colonnes/lignes) qui couvre TOUTE la zone, avec un jitter
+       aléatoire à l'intérieur de chaque cellule — l'espace est rempli de
+       manière éparse mais sans trou. Rotation et empilement aléatoires. */
+    const zoneEl = document.getElementById("mois-photos");
+    zoneEl.innerHTML = "";
+    const cols = n <= 3 ? n : n <= 8 ? 3 : 4;
+    const rows = Math.ceil(n / cols);
+    const HAUT_LIGNE = 230;
+    zoneEl.style.minHeight = (rows * HAUT_LIGNE + 28) + "px";
+    melange.forEach((a, idx) => {
         const note = (a.note && a.note.trim()) ? `<span class="photo-note">${escapeHtml(a.note)}</span>` : "";
         const rot = (Math.random() * 70 - 35).toFixed(1);
-        const dx = (Math.random() * 36 - 18).toFixed(0);
-        const dy = (Math.random() * 20 - 10).toFixed(0);
         const z = Math.floor(Math.random() * n) + 1;
-        return `<div class="polaroid" style="transform:translate(${dx}px,${dy}px) rotate(${rot}deg);z-index:${z}">
-            <div class="photo-img-wrap"><img src="${a.url}" alt="${escapeHtml(a.nom)}">${note}</div>
-            <div class="photo-label">${escapeHtml(a.nom)}</div>
-        </div>`;
-    }).join("");
+        const col = idx % cols;
+        const row = Math.floor(idx / cols);
+        const dansRow = Math.min(cols, n - row * cols);
+        const cxFr = (col + 0.5) / dansRow;
+        const cyFr = (row + 0.5) / rows;
+        const div = document.createElement("div");
+        div.className = "polaroid";
+        div.style.zIndex = z;
+        div.innerHTML = `<div class="photo-img-wrap"><img src="${a.url}" alt="${escapeHtml(a.nom)}">${note}</div>
+            <div class="photo-label">${escapeHtml(a.nom)}</div>`;
+        zoneEl.appendChild(div);
+        const placer = () => {
+            const W = zoneEl.clientWidth, H = zoneEl.clientHeight;
+            const dx = (cxFr * W - div.offsetWidth / 2 + (Math.random() * 40 - 20)).toFixed(0);
+            const dy = (cyFr * H - div.offsetHeight / 2 + (Math.random() * 26 - 13)).toFixed(0);
+            div.style.left = dx + "px";
+            div.style.top = dy + "px";
+            div.style.transform = `rotate(${rot}deg)`;
+        };
+        placer();
+        div._placer = placer;
+    });
+    if (!window._resizeMeliMelo) {
+        window._resizeMeliMelo = true;
+        window.addEventListener("resize", () => {
+            document.querySelectorAll("#mois-photos .polaroid").forEach(p => p._placer && p._placer());
+        });
+    }
 
     const evenements = [];
     (state.donnees.jours_feries[annee] || []).forEach(f => {

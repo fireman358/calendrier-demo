@@ -78,19 +78,13 @@ h2 { margin: 0 0 10px; color: var(--bleu-fonce); font-size: 1.1em; }
 
 /* ===== Méli-mélo : tas de polaroids éparpillés (vue Mois) ===== */
 .mois-view-photos {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-    min-height: 200px;
-    padding: 26px 8px;
     position: relative;
+    padding: 14px 6px;
+    align-self: stretch;
 }
 .mois-view-photos .polaroid {
-    width: 150px;
-    flex: 0 0 auto;
-    margin: -14px;
+    width: 170px;
+    position: absolute;
     background: #fff;
     padding: 7px 7px 4px;
     border: none;
@@ -98,7 +92,6 @@ h2 { margin: 0 0 10px; color: var(--bleu-fonce); font-size: 1.1em; }
     box-shadow: 0 6px 16px rgba(0,0,0,.35);
     transition: transform .25s ease, box-shadow .25s ease;
     cursor: pointer;
-    position: relative;
     overflow: visible;
 }
 .mois-view-photos .polaroid:hover {
@@ -106,7 +99,7 @@ h2 { margin: 0 0 10px; color: var(--bleu-fonce); font-size: 1.1em; }
     z-index: 99 !important;
     box-shadow: 0 12px 28px rgba(0,0,0,.45);
 }
-.mois-view-photos .polaroid img { width: 100%; height: 130px; max-height: none; object-fit: cover; border-radius: 2px; background: #f0f0f0; display: block; }
+.mois-view-photos .polaroid img { width: 100%; height: 150px; max-height: none; object-fit: cover; border-radius: 2px; background: #f0f0f0; display: block; }
 .mois-view-photos .polaroid .photo-label { padding: 4px 2px 2px; font-size: .72em; }
 
 /* ===== Badge version ===== */
