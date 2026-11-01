@@ -286,12 +286,17 @@ h2 { margin: 0 0 10px; color: var(--bleu-fonce); font-size: 1.1em; }
         text-align: center; font-size: 2.2em; text-transform: uppercase;
         color: var(--bleu-fonce); letter-spacing: 2px; margin: 0 0 8px;
     }
-    .print-flex { display: flex; gap: 16px; flex: 1; min-height: 0; }
+    .print-flex { display: flex; gap: 16px; flex: 0 0 auto; min-height: 0; }
     .print-photos {
         flex: 2.2; display: grid; gap: 8px; align-content: stretch; min-height: 0;
     }
-    .print-infos { flex: 1.2; min-width: 0; overflow: hidden; }
-    .print-cal { width: 100%; border-collapse: collapse; table-layout: fixed; flex: 1; }
+    .print-infos { flex: 1.2; min-width: 0; overflow: visible; }
+    .print-photos .photo-wrapper img { max-height: 4.2cm; }
+    .print-cal-wrapper { flex: 0 0 auto; }
+    .print-cal { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .p-ul { margin: 2px 0; padding-left: 16px; }
+    .p-h3 { margin: 4px 0 2px; }
+    .p-legende { font-size: .75em; margin-top: 4px; }
     table.print-cal th, table.print-cal td { border: 1px solid #bbb; padding: 4px; vertical-align: top; }
     table.print-cal th { background: var(--bleu-fonce); color: white; text-transform: uppercase; font-size: .8em; }
     .p-day { font-weight: bold; font-size: 1.3em; color: #7f8c8d; display: block; }

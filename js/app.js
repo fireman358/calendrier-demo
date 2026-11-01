@@ -200,7 +200,7 @@ async function rendreMoisCourant() {
     /* colonnes selon le nombre : 1-2 → n, 3-4 → 2, 5-8 → 3, 9-12 → 4 */
     const cols = n <= 2 ? n : n <= 4 ? 2 : n <= 8 ? 3 : 4;
     const rows = Math.ceil(n / cols);
-    const CHEV = 1.26;   // chevauchement léger entre voisines
+    const CHEV = 1.0;    // pas de chevauchement structurel : les photos se touchent bord à bord, seule la rotation (+ jitter) crée un léger recouvrement des coins
     const ROT_MAX = 18;  // degrés — les coins pivotés restent proches
     const M = 12;        // marge intérieure de la zone
     const zs = melangerTableau([...Array(n).keys()].map(i => i + 1));
